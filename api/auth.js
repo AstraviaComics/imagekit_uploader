@@ -8,29 +8,30 @@ const imagekit = new ImageKit({
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
-    // Test endpoint
     return res.status(200).json({ message: "Hello from ImageKit Auth API!" });
   }
 
   if (req.method === "POST") {
-    const { file, fileName, folder } = req.body;
-
-    if (!file || !fileName) {
-      return res.status(400).json({ error: "file and fileName are required" });
-    }
-
     try {
+      const { file, fileName, folder } = req.body;
+      console.log("Received body:", req.body);
+
+      if (!file || !fileName) {
+        return res.status(400).json({ error: "file and fileName are required" });
+      }
+
       const response = await imagekit.upload({
-        file, // base64 atau URL
+        file,
         fileName,
-        folder // misalnya "/komik/abcd/chapter-1"
+        folder,
       });
 
       return res.status(200).json({ success: true, data: response });
     } catch (error) {
+      console.error("Upload error:", error.message);
       return res.status(500).json({ success: false, error: error.message });
     }
   }
 
-  res.status(405).json({ error: "Method not allowed" });
-        }
+  return res.status(405).json({ error: "Method not allowed" });
+}
